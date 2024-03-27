@@ -1,65 +1,76 @@
-# WiFi Distance Calculator
+# Distance Measurement from Access Points
 
-The WiFi Distance Calculator is a cross-platform C++ application that estimates the distance between the user and WiFi access points (APs) based on the signal strength (RSSI) of the WiFi network. This project demonstrates the use of an abstraction layer to provide platform-independent functionality alongside platform-specific implementations for Linux, Windows, and macOS.
+## Project Overview
+
+This project is designed to calculate distances from Wi-Fi Access Points (APs) in real time, leveraging signal strength indicators to estimate proximity. Developed in C++, this application runs within a Docker container based on Debian Linux, ensuring a consistent and isolated development and deployment environment.
+
+**Please note**: This application is specifically tailored for Debian-based Linux environments and is optimized for running within a Docker container. It is not intended for cross-platform use.
 
 ## Features
 
-- Scan for WiFi networks and display their SSIDs.
-- Calculate the distance from the WiFi access points based on RSSI.
-- Cross-platform support for Linux, Windows, and macOS.
+- Real-time calculation of distance from Access Points using signal strength.
+- Use of libpcap for capturing Wi-Fi packet information.
+- Deployment within a Docker container for consistent development and runtime environments.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will cover usage information and for the Docker container 
 
 ### Prerequisites
 
-- C++ compiler (GCC for Linux, MSVC for Windows, Clang for macOS)
-- CMake (Version 3.15 or higher)
-- Git
+- Docker installed on your machine. [Docker Installation Guide](https://docs.docker.com/get-docker/)
+- Basic knowledge of Docker and C++ development.
 
-### Installing
+### Installation
 
-1. Clone the repository:
-```bash
-git clone https://github.com/your_username/wifi-distance-calculator.git
-```
+1. **Build the Docker Image**
 
-2. Navigate to the project directory:
-```bash
-cd wifi-distance-calculator
-```
+   Navigate to the root directory of the project and build the Docker image with the following command:
 
-3. Build the project with CMake:
-```bash
-mkdir build && cd build
-cmake ..
-make
-```
+   ```sh
+   docker build -t ap-distance-calculator .
+   ```
 
-4. Run the application (the executable name might differ based on your platform):
-```bash
-./WifiDistanceCalculator
-```
+2. **Run the Application in a Container**
+
+   After the image is built, start your container with:
+
+   ```sh
+   docker run -it --rm ap-distance-calculator
+   ```
+
+   The `-it` flag allocates a pseudo-TTY, which simulates a terminal, and `--rm` cleans up the container and removes the file system when the container exits.
+
+### Development
+
+- To develop and test changes within the Docker container, you can mount your project directory into the container:
+
+  ```sh
+  docker run -it --rm -v $(pwd):/workspace ap-distance-calculator
+  ```
+
+- This mounts the current directory (`$(pwd)`) to `/workspace` in the container. You can then compile and run your application within the container, reflecting any changes made on your host machine.
 
 ## Usage
 
-After launching the application, it will automatically begin scanning for WiFi networks and calculating distances based on RSSI values. The results will be displayed in the terminal.
+Once inside the container, your application can be compiled and run with commands specific to your project's build system (e.g., using `make`, `cmake`, etc.).
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Contributions to this project are welcome. Please consider the following steps:
 
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/catenacciA/wifi-distance-calculator/tags).
-
-## Authors
-
-- **Alessandro Catenacci** - *Initial work* - [catenacciA](https://github.com/catenacciA)
-
-See also the list of [contributors](https://github.com/catenacciA/wifi-distance-calculator/contributors) who participated in this project.
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature-fooBar`).
+3. Commit your changes (`git commit -am 'Add some fooBar'`).
+4. Push to the branch (`git push origin feature-fooBar`).
+5. Create a new Pull Request.
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the MIT License - see the LICENSE.md file for details.
+
+## Acknowledgments
+
+- Thanks to all contributors who have helped to improve this application.
+- Special thanks to the open-source community for providing the essential libraries and tools.
+- 
