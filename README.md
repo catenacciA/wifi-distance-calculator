@@ -7,7 +7,7 @@ WifiDistanceCalculator is a C++ project designed to run on Linux machines. It ca
 The distance calculation is based on the following path loss model formula:
 
 ```math
-L_{(dB)} = L_0 + 10 \cdot n \cdot \log_10(d/d_0) + X_σ
+L_{(dB)} = L_0 + 10 \cdot n \cdot \log_{10}(d/d_0) + X_σ
 ```
 
 - $L_{(dB)}$ is the path loss in decibels (dB).

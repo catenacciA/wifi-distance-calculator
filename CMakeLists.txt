@@ -11,4 +11,4 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 include_directories(src/include)
 
 # Add executable
-add_executable(WiFiDistanceCalculator src/main.cpp src/WiFiScanner.cpp)
+add_executable(WiFiDistanceCalculator src/main.cpp src/WiFiScanner.cpp src/DistanceCalculator.cpp)

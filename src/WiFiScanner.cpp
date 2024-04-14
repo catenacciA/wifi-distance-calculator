@@ -1,4 +1,3 @@
-#include "include/WiFiScanner.hpp"
 #include <algorithm>
 #include <chrono>
 #include <cstdlib>
@@ -6,10 +5,14 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <regex>
 #include <sstream>
 #include <stdexcept>
 #include <unistd.h>
 #include <vector>
+
+#include "include/DistanceCalculator.hpp"
+#include "include/WiFiScanner.hpp"
 
 // Constructor
 WiFiScanner::WiFiScanner() : keepRunning(false) {}
@@ -43,15 +46,19 @@ void printResultsTable(
   }
 
   // Print table header
-  std::cout << std::left << std::setw(30) << "SSID" << std::setw(10) << "Signal"
-            << std::setw(10) << "Freq" << std::endl;
-  std::cout << std::string(50, '-') << std::endl; // Print a separator line
+  std::cout << std::left << std::setw(30) << "SSID" << std::setw(20)
+            << "Signal (dBm)" << std::setw(15) << "Freq (MHz)" << std::setw(15)
+            << "Distance (m)" << std::endl;
+  std::cout << std::string(80, '-') << std::endl; // Print a separator line
 
-  // Print each AP's details
+  // Print each AP's details including calculated distance
   for (const auto &ap : results) {
-    std::cout << std::left << std::setw(30) << ap.SSID << std::setw(10)
-              << ap.signalStrengthDbm << " dBm" << std::setw(10)
-              << ap.frequencyMhz << " MHz" << std::endl;
+    double distance = DistanceCalculator::calculateDistanceToAP(ap);
+    std::cout << std::left << std::setw(30) << ap.SSID << std::setw(20)
+              << std::fixed << std::setprecision(2) << ap.signalStrengthDbm
+              << std::setw(15) << std::fixed << std::setprecision(2)
+              << ap.frequencyMhz << std::setw(15) << std::fixed
+              << std::setprecision(2) << distance << std::endl;
   }
 }
 
@@ -139,13 +146,20 @@ void WiFiScanner::scanForSignals() {
 
 bool WiFiScanner::isSSIDNull(const std::string &ssid) {
   if (ssid.empty()) {
-    std::cerr << "DEBUG: SSID is empty." << std::endl;
     return true;
   }
-  if (ssid.find("\x00") != std::string::npos) {
-    std::cerr << "DEBUG: SSID contains null character." << std::endl;
+
+  // Check if all characters in the SSID are null ('\0').
+  if (std::all_of(ssid.begin(), ssid.end(), [](char c) { return c == '\0'; })) {
     return true;
   }
+
+  // Regex to match a string consisting only of repeated "\x00"
+  std::regex nullPattern(R"(^(\\x00)+$)");
+  if (std::regex_match(ssid, nullPattern)) {
+    return true;
+  }
+
   return false;
 }
 
@@ -156,7 +170,7 @@ WiFiScanner::parseScanResults(const std::string &filePath) {
   std::string line;
 
   if (!fileStream.is_open()) {
-    std::cerr << "DEBUG: Failed to open file: " << filePath << std::endl;
+    std::cerr << "Failed to open file: " << filePath << std::endl;
     return apInfos;
   }
 
@@ -165,28 +179,24 @@ WiFiScanner::parseScanResults(const std::string &filePath) {
   int freq = 0;
 
   while (std::getline(fileStream, line)) {
-    std::cerr << "DEBUG: Processing line: " << line << std::endl;
     std::istringstream iss(line);
     std::string key;
     if (std::getline(iss, key, ':')) {
       std::string value;
-      std::getline(iss >> std::ws, value); // Trim leading whitespace
+      std::getline(iss >> std::ws, value); // Trim leading whitespace from value
 
-      std::cerr << "DEBUG: Key=" << key << ", Value=" << value << std::endl;
+      // Trim whitespace from the key
+      key.erase(0, key.find_first_not_of(" \t"));
+      key.erase(key.find_last_not_of(" \t") + 1);
 
       if (key == "freq") {
         freq = std::stoi(value);
-        std::cerr << "DEBUG: Found frequency: " << freq << std::endl;
       } else if (key == "signal") {
         signal = std::stof(value.substr(0, value.find(" dBm")));
-        std::cerr << "DEBUG: Found signal: " << signal << " dBm" << std::endl;
       } else if (key == "SSID") {
         ssid = value;
         if (!isSSIDNull(ssid)) { // Only add AP if SSID is not null
-          std::cerr << "DEBUG: Found valid SSID: " << ssid << std::endl;
           apInfos.emplace_back(ssid, signal, freq);
-        } else {
-          std::cerr << "DEBUG: SSID is null, skipping." << std::endl;
         }
         // Reset variables for the next AP regardless of SSID validity
         ssid.clear();
@@ -196,7 +206,7 @@ WiFiScanner::parseScanResults(const std::string &filePath) {
     }
   }
   fileStream.close();
-  std::cerr << "DEBUG: Finished parsing scan results. Found " << apInfos.size()
+  std::cerr << "Finished parsing scan results. Found " << apInfos.size()
             << " access points." << std::endl;
   return apInfos;
 }
