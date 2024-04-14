@@ -28,11 +28,11 @@ public:
 
   /**
    * Calculates the estimated distance to an Access Point based on the RSSIs
-   * 
-   * @param ap 
-   * @return double 
+   *
+   * @param ap
+   * @return double
    */
-  static double calculateDistanceToAP(const WiFiScanner::AccessPointInfo& ap);
+  static double calculateDistanceToAP(const WiFiScanner::AccessPointInfo &ap);
 };
 
 #endif // DISTANCE_CALCULATOR_H
