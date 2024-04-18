@@ -85,8 +85,8 @@ std::string findWiFiInterface() {
       // Extract interface name
       std::istringstream issLine(line);
       std::string temp;
-      issLine >> temp; // Skip "Interface" keyword
-      issLine >> temp; // This should now contain the interface name
+      issLine >> temp;
+      issLine >> temp;
       return temp;
     }
   }
