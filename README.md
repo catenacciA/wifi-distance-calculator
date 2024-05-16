@@ -16,6 +16,7 @@ WiFi Distance Calculator is a tool designed to estimate the distance between WiF
 - **Python**: Required for some auxiliary scripts. Ensure Python 3.x is installed.
 - **vcpkg**: Required for managing C++ dependencies. Ensure it is installed in the `/opt` directory.
 - **jsoncpp**: Install the jsoncpp library using vcpkg.
+- **libmnl**: Required for the `wifi-scan` library.
 
 ### Installation
 
@@ -26,7 +27,8 @@ WiFi Distance Calculator is a tool designed to estimate the distance between WiF
    ```
 
 2. **Install Dependencies**
-   - **C++ (jsoncpp and vcpkg)**:
+   - **C++**:
+     - `vcpkg` and `jsoncpp`:
        ```sh
         cd /opt
         git clone https://github.com/Microsoft/vcpkg.git
@@ -34,13 +36,19 @@ WiFi Distance Calculator is a tool designed to estimate the distance between WiF
         ./bootstrap-vcpkg.sh
         ./vcpkg integrate install
         ./vcpkg install jsoncpp
-      ```
+       ```
+      - `libmnl`:
+        ```sh
+        sudo apt-get update 
+        sudo apt-get install build-essential
+        sudo apt-get install libmnl0 libmnl-dev
+        ```
    - **Python Libraries (Optional)**: Install the required Python packages.
      ```sh
      pip install -r requirements.txt
      ```
 
-3. **Build the Project**
+1. **Build the Project**
    ```sh
    mkdir build
    cd build
