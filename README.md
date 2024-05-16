@@ -16,25 +16,25 @@ WiFi Distance Calculator is a tool designed to estimate the distance between WiF
 - **Python**: Required for some auxiliary scripts. Ensure Python 3.x is installed.
 - **vcpkg**: Required for managing C++ dependencies. Ensure it is installed in the `/opt` directory.
 - **jsoncpp**: Install the jsoncpp library using vcpkg.
-  ```sh
-  cd /opt
-  git clone https://github.com/Microsoft/vcpkg.git
-  cd vcpkg
-  ./bootstrap-vcpkg.sh
-  ./vcpkg integrate install
-  ./vcpkg install jsoncpp
-  ```
 
 ### Installation
 
 1. **Clone the Repository**
    ```sh
-   git clone https://github.com/yourusername/wifi-distance-calculator.git
+   git clone https://github.com/catenacciA/wifi-distance-calculator.git
    cd wifi-distance-calculator
    ```
 
 2. **Install Dependencies**
-   - **C++ Libraries**: No additional C++ libraries are specified.
+   - **C++ (jsoncpp and vcpkg)**:
+       ```sh
+        cd /opt
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.sh
+        ./vcpkg integrate install
+        ./vcpkg install jsoncpp
+      ```
    - **Python Libraries (Optional)**: Install the required Python packages.
      ```sh
      pip install -r requirements.txt
@@ -79,7 +79,7 @@ Fingerprinting works by creating a grid in your environment of choice and specif
 ## Usage
 
 ### Running in Offline Mode
-To run the offline distance calculation and collect fingerprinting data:
+To run the offline fingerprinting data collection:
 ```sh
 cd build
 sudo ./wifi_scanner_offline <WiFi_Interface> <Config_File> <Fingerprint_Data_File>
@@ -88,6 +88,12 @@ Where:
 - `<WiFi_Interface>`: The WiFi interface to use for scanning.
 - `<Config_File>`: The JSON file containing the grid configuration.
 - `<Fingerprint_Data_File>`: The desired CSV file to save the fingerprint data.
+
+To run the offline distance calculation:
+```sh
+cd build
+sudo ./wifi_scanner_demo <WiFi_Interface> <Config_File>
+```
 
 ### Running in Online Mode
 For live location estimation:
