@@ -1,64 +1,115 @@
-# WifiDistanceCalculator
+# WiFi Distance Calculator
 
 ## Overview
-WifiDistanceCalculator is a C++ project designed to run on Linux machines. It calculates the distance from the computer to all visible Access Points (APs) based on the path loss model formula. This application uses a dedicated thread to scan and update distances in real-time, providing a dynamic view of the wifi landscape around the computer.
+WiFi Distance Calculator is a tool designed to estimate the distance between WiFi access points and devices using the Log-distance path loss model and the Fingerprinting Similarity Measure. The project is implemented in C++ and uses the `wifi-scan` library to scan WiFi signals. The tool can be used in offline mode to collect fingerprinting data and in online mode to estimate the location of a device based on the collected data.
 
-## Path Loss Model Formula
-The distance calculation is based on the following path loss model formula:
+## Features
+- **Distance Calculation**: Estimates the distance using log-distance path loss models.
+- **Fingerprinting**: Utilizes a fingerprint database to estimate location by creating a grid-based reference system.
 
-```math
-L_{(dB)} = L_0 + 10 \cdot n \cdot \log_{10}(d/d_0) + X_σ
-```
 
-- $L_{(dB)}$ is the path loss in decibels (dB).
-- $L_0$ is the path loss at a reference distance in dB.
-- $n$ is the path loss exponent, indicating how fast the signal decays with distance.
-- $d$ is the distance from the transmitter (in meters).
-- $d_0$ is the reference distance (in meters).
-- $X_σ$ is a variable accounting for the Gaussian random variable (in dB) representing the shadowing effect.
+## Getting Started
 
-Using this formula, WifiDistanceCalculator estimates the distance to each AP, given the signal strength and other known constants.
+### Prerequisites
+- **C++ Compiler**: Ensure you have a C++ compiler installed (e.g., g++, clang).
+- **CMake**: Make sure CMake is installed.
+- **Python**: Required for some auxiliary scripts. Ensure Python 3.x is installed.
+- **vcpkg**: Required for managing C++ dependencies. Ensure it is installed in the `/opt` directory.
+- **jsoncpp**: Install the jsoncpp library using vcpkg.
+  ```sh
+  cd /opt
+  git clone https://github.com/Microsoft/vcpkg.git
+  cd vcpkg
+  ./bootstrap-vcpkg.sh
+  ./vcpkg integrate install
+  ./vcpkg install jsoncpp
+  ```
 
-## Prerequisites
-- Linux operating system
-- C++ compiler (g++ recommended)
-- Make
-- Wireless tools and libraries for Linux
+### Installation
 
-## Installation
+1. **Clone the Repository**
+   ```sh
+   git clone https://github.com/yourusername/wifi-distance-calculator.git
+   cd wifi-distance-calculator
+   ```
 
-Clone the repository to your local machine:
+2. **Install Dependencies**
+   - **C++ Libraries**: No additional C++ libraries are specified.
+   - **Python Libraries (Optional)**: Install the required Python packages.
+     ```sh
+     pip install -r requirements.txt
+     ```
 
-```bash
-git clone https://github.com/catenacciA/wifi-distance-calculator
-cd WifiDistanceCalculator
-```
+3. **Build the Project**
+   ```sh
+   mkdir build
+   cd build
+   cmake ..
+   make
+   ```
 
-Compile the project:
+### Configuration
+- **Grid Configuration**: Modify the `grid_config.json` to set up the grid layout for location estimation. You would also need to specify the APs SSID's you are working with, you can, do it via the `targetSSIDs` label. Example:
+  
+  ```json
+  {
+      "grid_size": [9, 7],
+      "inaccessible_points": [
+          [1,0], [2,0], [3,0], [4,0], [5,0], [6,0], [7,0], [8,0], [9,0],
+          [6,1], [7,1], [8,1], [9,1],
+          [8,6], [9,6],
+          [8,7], [9,7]
+      ],
+      "reference_points": [
+          [1,1], [2,1], [3,1], [4,1], [5,1],
+          [1,2], [2,2], [3,2], [4,2], [5,2], [6,2], [7,2], [8,2], [9,2],
+          [1,3], [2,3], [3,3], [4,3], [5,3], [6,3], [7,3], [8,3], [9,3],
+          [1,4], [2,4], [3,4], [4,4], [5,4], [6,4], [7,4], [8,4], [9,4],
+          [1,5], [2,5], [3,5], [4,5], [5,5], [6,5], [7,5], [8,5], [9,5],
+          [1,6], [2,6], [3,6], [4,6], [5,6], [6,6], [7,6],
+          [1,7], [2,7], [3,7], [4,7], [5,7], [6,7], [7,7]
+      ],
+      "targetSSIDs": ["AP1", "AP2", "AP3"]
+  }
+  ```
 
-```bash
-mkdir build && cd build
-cmake ..
-make
-```
+### Fingerprinting
+Fingerprinting works by creating a grid in your environment of choice and specifying the grid details in `grid_config.json`. The offline mode is used for acquiring fingerprinting data based on the JSON file. To do this, the user must run the offline executable and walk through the environment to collect data for all cells in the grid, which will then be saved in the CSV file.
 
 ## Usage
 
-To start the WifiDistanceCalculator, execute with root privileges (required for wireless scanning):
-
-```bash
-sudo ./WifiDistanceCalculator
+### Running in Offline Mode
+To run the offline distance calculation and collect fingerprinting data:
+```sh
+cd build
+sudo ./wifi_scanner_offline <WiFi_Interface> <Config_File> <Fingerprint_Data_File>
 ```
+Where:
+- `<WiFi_Interface>`: The WiFi interface to use for scanning.
+- `<Config_File>`: The JSON file containing the grid configuration.
+- `<Fingerprint_Data_File>`: The desired CSV file to save the fingerprint data.
 
-The program will continuously scan for APs and update their distances in real-time. Output is displayed in the terminal window.
+### Running in Online Mode
+For live location estimation:
+```sh
+cd build
+sudo ./wifi_scanner_online <WiFi_Interface> <Config_File> <Fingerprint_Data_File>
+```
+Where:
+- `<WiFi_Interface>`: The WiFi interface to use for scanning.
+- `<Config_File>`: The JSON file containing the grid configuration.
+- `<Fingerprint_Data_File>`: The CSV file containing the fingerprint data precently collected.
 
-## Features
-- Real-time scanning of visible Access Points (APs).
-- Distance calculation using the path loss model formula.
-- Multi-threading for continuous scanning and calculation.
+### Data Files
+In the `data` directory, you can find various csv files that i collected from my own environment. Also several python scripts that i used to process the data to have a general understanding of this program's accuracy in estimating distances and locations.
+
+## Acknowledgements
+This project includes the following libraries:
+- [wifi-scan](https://github.com/bmegli/wifi-scan): C/C++ library for scanning WiFi signals.
+- [jsoncpp](https://github.com/open-source-parsers/jsoncpp): JSON parser for C++.
 
 ## Contributing
-Contributions to WifiDistanceCalculator are welcome. Please follow these steps:
+Contributions are welcome! Please follow these steps:
 
 1. Fork the repository.
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`).
@@ -67,8 +118,4 @@ Contributions to WifiDistanceCalculator are welcome. Please follow these steps:
 5. Open a Pull Request.
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-- Thanks to all contributors who have helped in refining the WifiDistanceCalculator.
-- Special thanks to the developers and maintainers of the wireless tools and libraries for Linux.
+This project is licensed under the the GNU General Public License v3.0 License - see the [LICENSE](LICENSE) file for details.

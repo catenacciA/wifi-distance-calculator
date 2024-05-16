@@ -1,0 +1,12 @@
+,All Distances,All Distances,All Metrics,Short Distances,Short Distances,Short Metrics,Middle Distances,Middle Distances,Middle Metrics,Long Distances,Long Distances,Long Metrics
+,absolute_error,relative_error,0,absolute_error,relative_error,1,absolute_error,relative_error,2,absolute_error,relative_error,3
+count,2590.0,2590.0,,675.0,675.0,,1127.0,1127.0,,788.0,788.0,
+mean,3.344,0.8055,,2.7197,1.6319,,2.9837,0.5361,,4.3942,0.4827,
+std,2.8931,1.0814,,2.7859,1.7175,,2.6689,0.5435,,3.012,0.3231,
+min,0.003,0.0008,,0.003,0.0015,,0.0045,0.0008,,0.0726,0.0073,
+25%,1.3037,0.2757,,0.8414,0.394,,1.2636,0.2307,,2.5121,0.2769,
+50%,2.8139,0.5145,,1.8475,1.0519,,2.4775,0.4424,,4.3398,0.4838,
+75%,4.6829,0.7606,,3.7452,2.2879,,3.9593,0.659,,5.9044,0.6465,
+max,34.3236,9.4192,,18.6066,9.4192,,29.2827,6.8904,,34.3236,3.4324,
+MAE,,,3.344,,,2.7197,,,2.9837,,,4.3942
+RMSE,,,4.4214,,,3.8918,,,4.0023,,,5.3264

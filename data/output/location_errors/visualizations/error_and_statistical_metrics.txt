@@ -1,0 +1,41 @@
+Results for 3_7:
+Mean Estimated Location: [3.9        5.96666667]
+Standard Deviation: [0.4025779  0.80871688]
+Mean Error: 1.4818119524306714 meters
+Median Error: 1.4142135623730951 meters
+RMSE: 1.632993161855452 meters
+
+Results for 3_7_v2:
+Mean Estimated Location: [4.6        2.83333333]
+Standard Deviation: [1.16263672 2.18274319]
+Mean Error: 4.70841926376871 meters
+Median Error: 6.16227766016838 meters
+RMSE: 5.082650227325635 meters
+
+Results for 4_3:
+Mean Estimated Location: [4. 4.]
+Standard Deviation: [0. 0.]
+Mean Error: 1.0 meters
+Median Error: 1.0 meters
+RMSE: 1.0 meters
+
+Results for 5_5:
+Mean Estimated Location: [4.9 4.2]
+Standard Deviation: [0.30512858 1.62735241]
+Mean Error: 0.8123105625617661 meters
+Median Error: 0.0 meters
+RMSE: 1.816590212458495 meters
+
+Results for 6_3:
+Mean Estimated Location: [7.13333333 3.        ]
+Standard Deviation: [1.67606545 1.46216655]
+Mean Error: 2.240037299837096 meters
+Median Error: 1.4142135623730951 meters
+RMSE: 2.463060426921489 meters
+
+Combined Results:
+Mean Estimated Location: [4.90666667 4.        ]
+Standard Deviation: [1.49875414 1.80231023]
+Mean Error: 2.048515815719649 meters
+Median Error: 1.4142135623730951 meters
+RMSE: 2.7880698221768645 meters
