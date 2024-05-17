@@ -28,7 +28,7 @@ void displayProgressBar(int current, int total) {
   std::cout.flush();
 }
 
-std::set<std::string> loadTargetSSIDs(const std::string &filename) {
+std::set<std::string> loadTargetBSSIDs(const std::string &filename) {
   std::ifstream file(filename, std::ifstream::binary);
   if (!file.is_open()) {
     throw std::runtime_error("Unable to open configuration file");
@@ -36,14 +36,14 @@ std::set<std::string> loadTargetSSIDs(const std::string &filename) {
 
   Json::Value root;
   file >> root;
-  std::set<std::string> targetSSIDs;
+  std::set<std::string> targetBSSIDs;
 
-  const Json::Value ssids = root["targetSSIDs"];
-  for (const auto &ssid : ssids) {
-    targetSSIDs.insert(ssid.asString());
+  const Json::Value bssids = root["targetBSSIDs"];
+  for (const auto &bssid : bssids) {
+    targetBSSIDs.insert(bssid.asString());
   }
 
-  return targetSSIDs;
+  return targetBSSIDs;
 }
 
 WiFiScanner::WiFiScanner(const std::string &interface,
@@ -54,7 +54,7 @@ WiFiScanner::WiFiScanner(const std::string &interface,
   if (!wifi) {
     throw std::runtime_error("Failed to initialize WiFi scan");
   }
-  targetSSIDs = loadTargetSSIDs(configFile);
+  targetBSSIDs = loadTargetBSSIDs(configFile);
 }
 
 WiFiScanner::~WiFiScanner() { wifi_scan_close(wifi); }
@@ -69,28 +69,23 @@ std::vector<WiFiScanner::APInfo> WiFiScanner::scan(bool filter) {
   }
 
   std::vector<APInfo> apInfos;
-  std::unordered_set<std::string> seenSSIDs;
 
   for (int i = 0; i < numAPs && i < maxAPs; ++i) {
-    std::string ssid(bssInfos[i].ssid);
-    if (!filter || targetSSIDs.find(ssid) != targetSSIDs.end()) {
-      if (seenSSIDs.find(ssid) == seenSSIDs.end()) {
-        APInfo apInfo;
-        char bssidStr[BSSID_STRING_LENGTH];
-        snprintf(bssidStr, BSSID_STRING_LENGTH, "%02x:%02x:%02x:%02x:%02x:%02x",
-                 bssInfos[i].bssid[0], bssInfos[i].bssid[1],
-                 bssInfos[i].bssid[2], bssInfos[i].bssid[3],
-                 bssInfos[i].bssid[4], bssInfos[i].bssid[5]);
+    char bssidStr[BSSID_STRING_LENGTH];
+    snprintf(bssidStr, BSSID_STRING_LENGTH, "%02x:%02x:%02x:%02x:%02x:%02x",
+             bssInfos[i].bssid[0], bssInfos[i].bssid[1],
+             bssInfos[i].bssid[2], bssInfos[i].bssid[3],
+             bssInfos[i].bssid[4], bssInfos[i].bssid[5]);
 
-        apInfo.bssid = std::string(bssidStr);
-        apInfo.ssid = ssid;
-        apInfo.signalStrength = bssInfos[i].signal_mbm / 100;
-        apInfo.distance =
-            distanceCalculator->calculateDistance(apInfo.signalStrength);
-        apInfo.seenMsAgo = bssInfos[i].seen_ms_ago;
-        apInfos.push_back(apInfo);
-        seenSSIDs.insert(ssid);
-      }
+    std::string bssid(bssidStr);
+    if (!filter || targetBSSIDs.find(bssid) != targetBSSIDs.end()) {
+      APInfo apInfo;
+      apInfo.bssid = bssid;
+      apInfo.ssid = std::string(bssInfos[i].ssid);
+      apInfo.signalStrength = bssInfos[i].signal_mbm / 100;
+      apInfo.distance = distanceCalculator->calculateDistance(apInfo.signalStrength);
+      apInfo.seenMsAgo = bssInfos[i].seen_ms_ago;
+      apInfos.push_back(apInfo);
     }
   }
 

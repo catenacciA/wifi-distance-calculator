@@ -29,7 +29,7 @@ public:
 private:
     struct wifi_scan *wifi;
     std::unique_ptr<DistanceCalculator> distanceCalculator;
-    std::set<std::string> targetSSIDs;
+    std::set<std::string> targetBSSIDs;
 };
 
 #endif // WIFISCANNER_H
