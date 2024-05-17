@@ -1,4 +1,4 @@
-#include "../include/WiFiScanner.h"
+#include "../../include/wifi/WiFiScanner.h"
 #include <chrono>
 #include <cstring>
 #include <fstream>

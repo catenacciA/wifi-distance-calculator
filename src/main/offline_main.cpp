@@ -1,6 +1,6 @@
-#include "../include/DistanceCalculatorFactory.h"
-#include "../include/WiFiScanner.h"
-#include "../include/WiFiScannerFactory.h"
+#include "../../include/distance/DistanceCalculatorFactory.h"
+#include "../../include/wifi/WiFiScanner.h"
+#include "../../include/wifi/WiFiScannerFactory.h"
 #include <chrono>
 #include <fstream>
 #include <iostream>

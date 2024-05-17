@@ -1,8 +1,8 @@
-#include "../include/DistanceCalculatorFactory.h"
-#include "../include/FingerprintDatabase.h"
-#include "../include/FingerprintMatcher.h"
-#include "../include/LocationEstimator.h"
-#include "../include/WiFiScannerFactory.h"
+#include "../../include/distance/DistanceCalculatorFactory.h"
+#include "../../include/fingerprint/FingerprintDatabase.h"
+#include "../../include/fingerprint/FingerprintMatcher.h"
+#include "../../include/fingerprint/LocationEstimator.h"
+#include "../../include/wifi/WiFiScannerFactory.h"
 #include <iostream>
 
 void printUsage(const std::string &programName) {

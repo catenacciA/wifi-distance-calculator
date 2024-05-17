@@ -6,7 +6,7 @@
 #include <memory>
 #include <set>
 #include "wifi_scan.h"
-#include "DistanceCalculator.h"
+#include "../distance/DistanceCalculator.h"
 
 // Class for scanning for WiFi access points
 class WiFiScanner {

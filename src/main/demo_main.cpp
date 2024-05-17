@@ -1,5 +1,5 @@
-#include "../include/DistanceCalculatorFactory.h"
-#include "../include/WiFiScannerFactory.h"
+#include "../../include/distance/DistanceCalculatorFactory.h"
+#include "../../include/wifi/WiFiScannerFactory.h"
 #include <iostream>
 #include <sstream>
 #include <vector>

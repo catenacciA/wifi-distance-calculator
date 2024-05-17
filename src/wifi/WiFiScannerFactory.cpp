@@ -1,5 +1,5 @@
-#include "../include/WiFiScannerFactory.h"
-#include "../include/WiFiScanner.h"
+#include "../../include/wifi/WiFiScannerFactory.h"
+#include "../../include/wifi/WiFiScanner.h"
 #include <memory>
 
 std::unique_ptr<WiFiScanner> WiFiScannerFactory::create(

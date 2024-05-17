@@ -1,4 +1,4 @@
-#include "../include/LocationEstimator.h"
+#include "../../include/fingerprint/LocationEstimator.h"
 
 LocationEstimator::LocationEstimator(
     std::unique_ptr<WiFiScanner> scanner,

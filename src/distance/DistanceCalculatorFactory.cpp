@@ -1,5 +1,5 @@
-#include "../include/DistanceCalculatorFactory.h"
-#include "../include/LogDistanceCalculator.h"
+#include "../../include/distance/DistanceCalculatorFactory.h"
+#include "../../include/distance/LogDistanceCalculator.h"
 
 std::unique_ptr<DistanceCalculator> DistanceCalculatorFactory::createLogDistanceCalculator() {
     double pathLossExponent = 14.61;

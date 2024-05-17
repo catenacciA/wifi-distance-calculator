@@ -1,4 +1,4 @@
-#include "../include/LogDistanceCalculator.h"
+#include "../../include/distance/LogDistanceCalculator.h"
 #include <cmath>
 
 LogDistanceCalculator::LogDistanceCalculator(double pathLossExponent,

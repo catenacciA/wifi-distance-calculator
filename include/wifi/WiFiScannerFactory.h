@@ -1,7 +1,7 @@
 #ifndef WIFISCANNERFACTORY_H
 #define WIFISCANNERFACTORY_H
 
-#include "DistanceCalculator.h"
+#include "../distance/DistanceCalculator.h"
 #include "WiFiScanner.h"
 #include <memory>
 #include <string>

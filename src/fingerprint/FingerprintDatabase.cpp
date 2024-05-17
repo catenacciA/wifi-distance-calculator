@@ -1,4 +1,4 @@
-#include "../include/FingerprintDatabase.h"
+#include "../../include/fingerprint/FingerprintDatabase.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
