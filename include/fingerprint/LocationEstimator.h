@@ -1,8 +1,8 @@
 #ifndef LOCATIONESTIMATOR_H
 #define LOCATIONESTIMATOR_H
 
-#include "WiFiScanner.h"
-#include "FingerprintMatcher.h"
+#include "../wifi/WiFiScanner.h"
+#include "../fingerprint/FingerprintMatcher.h"
 
 // Class for estimating the current location of a device
 class LocationEstimator {

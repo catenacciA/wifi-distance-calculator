@@ -12,32 +12,32 @@ set(CMAKE_TOOLCHAIN_FILE "/opt/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STR
 include_directories(include)
 
 set(DEMO_MAIN_SOURCES
-    src/demo_main.cpp
-    src/WiFiScanner.cpp
-    src/WiFiScannerFactory.cpp
-    src/DistanceCalculatorFactory.cpp
-    src/LogDistanceCalculator.cpp
+    src/main/demo_main.cpp
+    src/wifi/WiFiScanner.cpp
+    src/wifi/WiFiScannerFactory.cpp
+    src/distance/DistanceCalculatorFactory.cpp
+    src/distance/LogDistanceCalculator.cpp
     lib/wifi_scan.c
 )
 
 set(OFFLINE_SOURCES
-    src/offline_main.cpp
-    src/WiFiScanner.cpp
-    src/WiFiScannerFactory.cpp
-    src/DistanceCalculatorFactory.cpp
-    src/LogDistanceCalculator.cpp
+    src/main/offline_main.cpp
+    src/wifi/WiFiScanner.cpp
+    src/wifi/WiFiScannerFactory.cpp
+    src/distance/DistanceCalculatorFactory.cpp
+    src/distance/LogDistanceCalculator.cpp
     lib/wifi_scan.c
 )
 
 set(ONLINE_SOURCES
-    src/online_main.cpp
-    src/WiFiScanner.cpp
-    src/WiFiScannerFactory.cpp
-    src/DistanceCalculatorFactory.cpp
-    src/LogDistanceCalculator.cpp
-    src/FingerprintDatabase.cpp
-    src/FingerprintMatcher.cpp
-    src/LocationEstimator.cpp
+    src/main/online_main.cpp
+    src/wifi/WiFiScanner.cpp
+    src/wifi/WiFiScannerFactory.cpp
+    src/distance/DistanceCalculatorFactory.cpp
+    src/distance/LogDistanceCalculator.cpp
+    src/fingerprint/FingerprintDatabase.cpp
+    src/fingerprint/FingerprintMatcher.cpp
+    src/fingerprint/LocationEstimator.cpp
     lib/wifi_scan.c
 )
 

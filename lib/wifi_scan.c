@@ -38,7 +38,7 @@
   *
   */
 
-#include "wifi_scan.h"
+#include "../include/wifi/wifi_scan.h"
 
 #include <libmnl/libmnl.h> //netlink libmnl
 #include <linux/nl80211.h> //nl80211 netlink
