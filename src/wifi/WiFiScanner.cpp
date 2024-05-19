@@ -46,6 +46,26 @@ std::set<std::string> loadTargetBSSIDs(const std::string &filename) {
   return targetBSSIDs;
 }
 
+std::map<std::string, Eigen::Vector3d> loadAPPositions(const std::string &filename) {
+  std::ifstream file(filename, std::ifstream::binary);
+  if (!file.is_open()) {
+    throw std::runtime_error("Unable to open configuration file");
+  }
+
+  Json::Value root;
+  file >> root;
+  std::map<std::string, Eigen::Vector3d> apPositions;
+
+  const Json::Value positions = root["ap_positions"];
+  for (const auto &bssid : positions.getMemberNames()) {
+    const Json::Value &position = positions[bssid];
+    apPositions[bssid] = Eigen::Vector3d(
+        position[0].asDouble(), position[1].asDouble(), position[2].asDouble());
+  }
+
+  return apPositions;
+}
+
 WiFiScanner::WiFiScanner(const std::string &interface,
                          std::unique_ptr<DistanceCalculator> distanceCalculator,
                          const std::string &configFile)
@@ -55,6 +75,7 @@ WiFiScanner::WiFiScanner(const std::string &interface,
     throw std::runtime_error("Failed to initialize WiFi scan");
   }
   targetBSSIDs = loadTargetBSSIDs(configFile);
+  apPositions = loadAPPositions(configFile);
 }
 
 WiFiScanner::~WiFiScanner() { wifi_scan_close(wifi); }
@@ -85,11 +106,24 @@ std::vector<WiFiScanner::APInfo> WiFiScanner::scan(bool filter) {
       apInfo.signalStrength = bssInfos[i].signal_mbm / 100;
       apInfo.distance = distanceCalculator->calculateDistance(apInfo.signalStrength);
       apInfo.seenMsAgo = bssInfos[i].seen_ms_ago;
+      
+      // Set the AP position from the configuration, if available
+      auto it = apPositions.find(bssid);
+      if (it != apPositions.end()) {
+        apInfo.position = it->second;
+      } else {
+        apInfo.position = Eigen::Vector3d::Zero();
+      }
+
       apInfos.push_back(apInfo);
     }
   }
 
   return apInfos;
+}
+
+const std::map<std::string, Eigen::Vector3d>& WiFiScanner::getAPPositions() const {
+  return apPositions;
 }
 
 void WiFiScanner::logData(const std::string &cellId, int numScans,

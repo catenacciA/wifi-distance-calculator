@@ -3,6 +3,7 @@
 
 #include "../distance/DistanceCalculator.h"
 #include "WiFiScanner.h"
+#include "WiFiScannerWithConfig.h"
 #include <memory>
 #include <string>
 
@@ -13,6 +14,11 @@ public:
   create(const std::string &interface,
          std::unique_ptr<DistanceCalculator> distanceCalculator,
          const std::string &configFile);
+
+  static std::unique_ptr<WiFiScannerWithConfig>
+  createWithConfig(const std::string &interface,
+                   std::unique_ptr<DistanceCalculator> distanceCalculator,
+                   const std::string &configFile);
 };
 
 #endif // WIFISCANNERFACTORY_H
