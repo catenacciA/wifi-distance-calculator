@@ -14,9 +14,6 @@ include_directories(include)
 set(DEMO_MAIN_SOURCES
     src/main/demo_main.cpp
     src/wifi/WiFiScanner.cpp
-    src/wifi/WiFiScannerFactory.cpp
-    src/wifi/WiFiScannerWithConfig.cpp
-    src/distance/DistanceCalculatorFactory.cpp
     src/distance/LogDistanceCalculator.cpp
     lib/wifi_scan.c
 )
@@ -24,32 +21,27 @@ set(DEMO_MAIN_SOURCES
 set(OFFLINE_SOURCES
     src/main/offline_main.cpp
     src/wifi/WiFiScanner.cpp
-    src/wifi/WiFiScannerFactory.cpp
-    src/wifi/WiFiScannerWithConfig.cpp
-    src/distance/DistanceCalculatorFactory.cpp
     src/distance/LogDistanceCalculator.cpp
+    src/Logger.cpp
+    src/ProgressBar.cpp
     lib/wifi_scan.c
 )
 
 set(ONLINE_SOURCES
     src/main/online_main.cpp
     src/wifi/WiFiScanner.cpp
-    src/wifi/WiFiScannerFactory.cpp
-    src/wifi/WiFiScannerWithConfig.cpp
-    src/distance/DistanceCalculatorFactory.cpp
     src/distance/LogDistanceCalculator.cpp
     src/fingerprint/FingerprintDatabase.cpp
     src/fingerprint/FingerprintMatcher.cpp
     src/fingerprint/LocationEstimator.cpp
+    src/fingerprint/RSSISimilarityCalculator.cpp
+    src/fingerprint/CSVDatabaseParser.cpp
     lib/wifi_scan.c
 )
 
 set(CONFIG_TEST_SOURCES
     src/main/config_test.cpp
     src/wifi/WiFiScanner.cpp
-    src/wifi/WiFiScannerFactory.cpp
-    src/wifi/WiFiScannerWithConfig.cpp
-    src/distance/DistanceCalculatorFactory.cpp
     src/distance/LogDistanceCalculator.cpp
     lib/wifi_scan.c
 )

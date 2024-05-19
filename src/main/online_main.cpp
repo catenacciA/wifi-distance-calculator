@@ -1,8 +1,11 @@
-#include "../../include/distance/DistanceCalculatorFactory.h"
+#include "../../include/distance/LogDistanceCalculator.h"
+#include "../../include/fingerprint/CSVDatabaseParser.h"
 #include "../../include/fingerprint/FingerprintDatabase.h"
 #include "../../include/fingerprint/FingerprintMatcher.h"
 #include "../../include/fingerprint/LocationEstimator.h"
-#include "../../include/wifi/WiFiScannerFactory.h"
+#include "../../include/fingerprint/RSSISimilarityCalculator.h"
+#include "../../include/wifi/WiFiScanner.h"
+#include <fstream>
 #include <iostream>
 
 void printUsage(const std::string &programName) {
@@ -31,12 +34,16 @@ int main(int argc, char *argv[]) {
 
   try {
     auto distanceCalculator =
-        DistanceCalculatorFactory::createLogDistanceCalculator();
-    auto wifiScanner = WiFiScannerFactory::create(
-        wifiInterface, std::move(distanceCalculator), configFile);
+        std::make_unique<LogDistanceCalculator>(14.61, 1, 41.72, 39.40);
+    auto wifiScanner = std::make_unique<WiFiScanner>(wifiInterface, std::move(distanceCalculator), configFile);
 
-    FingerprintDatabase database(fingerprintDataFile);
-    auto matcher = std::make_unique<FingerprintMatcher>(database);
+    CSVDatabaseParser csvParser;
+    FingerprintDatabase database(csvParser, fingerprintDataFile);
+
+    RSSISimilarityCalculator similarityCalculator;
+    auto matcher =
+        std::make_unique<FingerprintMatcher>(database, similarityCalculator);
+
     LocationEstimator estimator(std::move(wifiScanner), std::move(matcher));
 
     std::string estimatedLocation = estimator.estimateLocation();

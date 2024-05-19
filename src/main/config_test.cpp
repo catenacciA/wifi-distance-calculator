@@ -1,24 +1,30 @@
-#include "../../include/distance/DistanceCalculatorFactory.h"
-#include "../../include/wifi/WiFiScannerFactory.h"
-#include "../../include/wifi/WiFiScannerWithConfig.h"
+#include "../../include/Logger.h"
+#include "../../include/ProgressBar.h"
+#include "../../include/distance/LogDistanceCalculator.h"
+#include "../../include/wifi/WiFiScanner.h"
 #include <iostream>
 
 int main() {
   std::string wifiInterface = "wlp1s0f0";
-  std::string configFile = "../grid_config.json";
-  auto distanceCalculator =
-      DistanceCalculatorFactory::createLogDistanceCalculator();
+  std::string configFile = "../config.json";
 
-  auto wifiScannerWithConfig = WiFiScannerFactory::createWithConfig(
-      wifiInterface, std::move(distanceCalculator), configFile);
-  auto apInfos = wifiScannerWithConfig->scan(true);
+  // Create the distance calculator
+  auto distanceCalculator =
+      std::make_unique<LogDistanceCalculator>(14.61, 1, 41.72, 39.40);
+
+  // Create the WiFi scanner with configuration
+  WiFiScanner wifiScanner(wifiInterface, std::move(distanceCalculator),
+                          configFile);
+
+  // Scan for APs
+  auto apInfos = wifiScanner.scan(true);
 
   // Print AP scan results with positions from config
-  const auto &apPositions = wifiScannerWithConfig->getAPPositions();
+  const auto &apPositions = wifiScanner.getAPPositions();
   for (const auto &apInfo : apInfos) {
     auto it = apPositions.find(apInfo.bssid);
     if (it != apPositions.end()) {
-      std::cout << "AP BSSID: " << apInfo.bssid
+      std::cout << "AP: " << apInfo.bssid
                 << " Distance: " << apInfo.distance
                 << " Position: " << it->second.transpose() << std::endl;
     } else {

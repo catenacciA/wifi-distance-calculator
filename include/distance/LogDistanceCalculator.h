@@ -1,11 +1,11 @@
 #ifndef LOGDISTANCECALCULATOR_H
 #define LOGDISTANCECALCULATOR_H
 
-#include "DistanceCalculator.h"
+#include "IDistanceCalculator.h"
 #include <random>
 
 // Class for calculating distance based on the log-distance path loss model
-class LogDistanceCalculator : public DistanceCalculator {
+class LogDistanceCalculator : public IDistanceCalculator {
 public:
     LogDistanceCalculator(double pathLossExponent, double referenceDistance, double referenceRSSI, double sigma);
     double calculateDistance(int signalStrength) const override;
