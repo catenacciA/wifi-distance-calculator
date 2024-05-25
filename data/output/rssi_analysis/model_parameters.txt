@@ -2,13 +2,13 @@ A (Radio frequency parameter at 1m): 41.723636363636366 dBm
 
 Path loss indices:
 n_d at distance 2m: 29.413371244364104
-n_d at distance 3m: 18.841698349584988
-n_d at distance 4m: 15.62554994324004
-n_d at distance 5m: 13.556306031711847
-n_d at distance 6m: 11.386811374184111
-n_d at distance 7m: 11.196259662274988
 n_d at distance 8m: 10.801317813537304
 n_d at distance 9m: 10.259349587941667
 n_d at distance 10m: 10.403536896936625
+n_d at distance 6m: 11.386811374184111
+n_d at distance 3m: 18.841698349584988
+n_d at distance 4m: 15.62554994324004
+n_d at distance 5m: 13.556306031711847
+n_d at distance 7m: 11.196259662274988
 
 Mean path loss index n: 14.609355655975074

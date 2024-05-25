@@ -1,4 +1,4 @@
-#include "../include/ProgressBar.h"
+#include "../include/utility/ProgressBar.h"
 #include <iostream>
 
 void ProgressBar::display(int current, int total) {

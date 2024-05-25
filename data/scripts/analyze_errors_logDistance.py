@@ -36,7 +36,7 @@ middle_distances = data[data['reference_distance'].between(4, 7)]
 long_distances = data[data['reference_distance'].between(8, 10)]
 
 def calculate_metrics(df):
-    mae = np.mean(df['absolute_error'])  # Correct calculation for MAE
+    mae = np.mean(df['absolute_error'])
     rmse = np.sqrt(np.mean(df['squared_error']))
     return pd.Series({'MAE': mae, 'RMSE': rmse})
 
@@ -52,23 +52,26 @@ middle_metrics = calculate_metrics(middle_distances)
 long_stats = long_distances[['absolute_error', 'relative_error']].describe()
 long_metrics = calculate_metrics(long_distances)
 
-
 stats_combined = pd.concat([
-    all_stats, all_metrics, 
-    short_stats, short_metrics, 
-    middle_stats, middle_metrics, 
+    all_stats, all_metrics,
+    short_stats, short_metrics,
+    middle_stats, middle_metrics,
     long_stats, long_metrics
-], axis=1, keys=['All Distances', 'All Metrics', 'Short Distances', 'Short Metrics', 'Middle Distances', 'Middle Metrics', 'Long Distances', 'Long Metrics'])
+], axis=1, keys=[
+    'All Distances', 'All Metrics',
+    'Short Distances', 'Short Metrics',
+    'Middle Distances', 'Middle Metrics',
+    'Long Distances', 'Long Metrics'
+])
 
-
-stats_combined = stats_combined.round(4) 
+stats_combined = stats_combined.round(4)
 stats_combined.to_csv(os.path.join(output_path, 'summary_statistics.csv'))
 
 sns.set(style="whitegrid")
 unique_distances = data['reference_distance'].unique()
 unique_distances.sort()
 n = len(unique_distances)
-fig, axes = plt.subplots(n//2 + n%2, 2, figsize=(14, 5*n//2))
+fig, axes = plt.subplots(n // 2 + n % 2, 2, figsize=(14, 5 * (n // 2)))
 axes = axes.flatten()
 
 for i, distance in enumerate(unique_distances):

@@ -1,46 +1,31 @@
 #include "../../include/wifi/WiFiScanner.h"
-#include <fstream>
 #include <iostream>
-#include <json/json.h>
 #include <stdexcept>
 
 WiFiScanner::WiFiScanner(
-    const std::string &interface,
-    std::unique_ptr<IDistanceCalculator> distanceCalculator,
-    const std::string &configFile)
-    : distanceCalculator(std::move(distanceCalculator)) {
+    const std::string &interface, std::shared_ptr<IConfigParser> config,
+    std::map<std::string, std::unique_ptr<IDistanceCalculator>>
+        distanceCalculators)
+    : distanceCalculators(std::move(distanceCalculators)),
+      targetBSSIDs(config->getTargetBSSIDs().begin(),
+                   config->getTargetBSSIDs().end()),
+      apPositions(config->getAPPositions()) {
+
   wifi = wifi_scan_init(interface.c_str());
   if (!wifi) {
     throw std::runtime_error("Failed to initialize WiFi scan");
-  }
-
-  if (!configFile.empty()) {
-    parseConfig(configFile);
   }
 }
 
 WiFiScanner::~WiFiScanner() { wifi_scan_close(wifi); }
 
-void WiFiScanner::parseConfig(const std::string &configFile) {
-  std::ifstream file(configFile, std::ifstream::binary);
-  if (!file.is_open()) {
-    throw std::runtime_error("Unable to open configuration file");
+IDistanceCalculator *
+WiFiScanner::getDistanceCalculator(const std::string &bssid) const {
+  auto it = distanceCalculators.find(bssid);
+  if (it != distanceCalculators.end()) {
+    return it->second.get();
   }
-
-  Json::Value root;
-  file >> root;
-
-  const Json::Value bssids = root["targetBSSIDs"];
-  for (const auto &bssid : bssids) {
-    targetBSSIDs.insert(bssid.asString());
-  }
-
-  const Json::Value positions = root["ap_positions"];
-  for (const auto &bssid : positions.getMemberNames()) {
-    const Json::Value &position = positions[bssid];
-    apPositions[bssid] = Eigen::Vector3d(
-        position[0].asDouble(), position[1].asDouble(), position[2].asDouble());
-  }
+  return nullptr;
 }
 
 std::vector<IWiFiScanner::APInfo> WiFiScanner::scan(bool filter) {
@@ -66,8 +51,14 @@ std::vector<IWiFiScanner::APInfo> WiFiScanner::scan(bool filter) {
       apInfo.bssid = bssid;
       apInfo.ssid = std::string(bssInfos[i].ssid);
       apInfo.signalStrength = bssInfos[i].signal_mbm / 100;
-      apInfo.distance =
-          distanceCalculator->calculateDistance(apInfo.signalStrength);
+
+      IDistanceCalculator *calculator = getDistanceCalculator(bssid);
+      if (calculator) {
+        apInfo.distance = calculator->calculateDistance(apInfo.signalStrength);
+      } else {
+        apInfo.distance = 0.0; // TODO: handle the error appropriately
+      }
+
       apInfo.seenMsAgo = bssInfos[i].seen_ms_ago;
 
       auto it = apPositions.find(bssid);
@@ -87,8 +78,4 @@ std::vector<IWiFiScanner::APInfo> WiFiScanner::scan(bool filter) {
 const std::map<std::string, Eigen::Vector3d> &
 WiFiScanner::getAPPositions() const {
   return apPositions;
-}
-
-IDistanceCalculator *WiFiScanner::getDistanceCalculator() const {
-  return distanceCalculator.get();
 }

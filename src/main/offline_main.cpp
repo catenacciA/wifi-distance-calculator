@@ -1,6 +1,7 @@
-#include "../../include/Logger.h"
-#include "../../include/ProgressBar.h"
 #include "../../include/distance/LogDistanceCalculator.h"
+#include "../../include/utility/ConfigParser.h"
+#include "../../include/utility/Logger.h"
+#include "../../include/utility/ProgressBar.h"
 #include "../../include/wifi/WiFiScanner.h"
 #include <algorithm>
 #include <chrono>
@@ -81,10 +82,25 @@ int main(int argc, char *argv[]) {
   std::string outputFile = argv[3];
 
   try {
-    auto distanceCalculator =
-        std::make_unique<LogDistanceCalculator>(14.61, 1, 41.72, 39.40);
-    WiFiScanner wifiScanner(wifiInterface, std::move(distanceCalculator),
-                            configFile);
+    // Create the ConfigParser instance
+    std::shared_ptr<IConfigParser> configParser =
+        std::make_shared<ConfigParser>(configFile);
+
+    // Retrieve the AP parameters from the config
+    const auto &apParameters = configParser->getAPParameters();
+
+    // Create the distance calculator instance for each AP
+    std::map<std::string, std::unique_ptr<IDistanceCalculator>>
+        distanceCalculators;
+    for (const auto &[bssid, params] : apParameters) {
+      distanceCalculators[bssid] = std::make_unique<LogDistanceCalculator>(
+          params.pathLossExponent, params.referenceDistance,
+          params.referencePathLoss, params.transmitPower, params.sigma);
+    }
+
+    // Initialize the WiFi scanner with the map of distance calculators
+    WiFiScanner wifiScanner(wifiInterface, configParser,
+                            std::move(distanceCalculators));
     Logger logger;
 
     Json::Value config = readGridConfig(configFile);
@@ -113,8 +129,10 @@ int main(int argc, char *argv[]) {
           rssiStats;
       for (const auto &[bssid, rssiValues] : rssiData) {
         auto [mean, stdev, min, max] = calculateStatistics(rssiValues);
+        IDistanceCalculator *calculator =
+            wifiScanner.getDistanceCalculator(bssid);
         double distance =
-            wifiScanner.getDistanceCalculator()->calculateDistance(mean);
+            calculator ? calculator->calculateDistance(mean) : 0.0;
         rssiStats[bssid] = std::make_tuple(mean, stdev, min, max, distance);
       }
 

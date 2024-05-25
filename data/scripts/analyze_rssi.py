@@ -106,6 +106,15 @@ descriptive_stats = combined_data[['rssi', 'rssi_normalized']].describe()
 
 grouped_stats = combined_data.groupby('distance')[['rssi', 'rssi_normalized']].describe().unstack()
 
+# Calculate combined statistics for the entire dataset
+combined_statistics = calculate_statistics(combined_data, 'rssi')
+combined_stats_df = pd.DataFrame([combined_statistics])
+combined_stats_df.to_csv(os.path.join(output_base_dir, 'combined_statistics.csv'), index=False)
+
+# Add combined statistics to grouped statistics
+combined_stats_series = pd.Series(combined_statistics, name='combined')
+grouped_stats = grouped_stats._append(combined_stats_series)
+
 descriptive_stats.to_csv(os.path.join(output_base_dir, 'descriptive_statistics.csv'))
 grouped_stats.to_csv(os.path.join(output_base_dir, 'grouped_statistics.csv'))
 

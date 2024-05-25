@@ -1,5 +1,6 @@
-#include "../../include/wifi/WiFiScanner.h"
 #include "../../include/distance/LogDistanceCalculator.h"
+#include "../../include/utility/ConfigParser.h"
+#include "../../include/wifi/WiFiScanner.h"
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -19,7 +20,7 @@ void printUsage(const std::string &programName) {
             << " <WiFi_Interface> <Config_File> [-a]" << std::endl;
   std::cout << "  <WiFi_Interface>: The name of the WiFi interface to use "
             << "(e.g., wlan0)" << std::endl;
-  std::cout << "  <Config_File>: The path to the configuration file"
+  std::cout << "  <Config_File>: The path to the configuration file (JSON)"
             << std::endl;
   std::cout << "  -a: Scan all visible APs (optional)" << std::endl;
 }
@@ -39,11 +40,25 @@ int main(int argc, char *argv[]) {
   }
 
   try {
-    auto distanceCalculator =
-        std::make_unique<LogDistanceCalculator>(14.61, 1, 41.72, 39.40);
+    // Create the ConfigParser instance
+    std::shared_ptr<IConfigParser> configParser =
+        std::make_shared<ConfigParser>(configFile);
 
-    WiFiScanner wifiScanner(wifiInterface, std::move(distanceCalculator),
-                            configFile);
+    // Retrieve the AP parameters from the config
+    const auto &apParameters = configParser->getAPParameters();
+
+    // Create the distance calculator instance for each AP
+    std::map<std::string, std::unique_ptr<IDistanceCalculator>>
+        distanceCalculators;
+    for (const auto &[bssid, params] : apParameters) {
+      distanceCalculators[bssid] = std::make_unique<LogDistanceCalculator>(
+          params.pathLossExponent, params.referenceDistance,
+          params.referencePathLoss, params.transmitPower, params.sigma);
+    }
+
+    // Initialize the WiFi scanner with the map of distance calculators
+    WiFiScanner wifiScanner(wifiInterface, configParser,
+                            std::move(distanceCalculators));
 
     // Scan for APs
     auto apInfos = wifiScanner.scan(!scanAll);
