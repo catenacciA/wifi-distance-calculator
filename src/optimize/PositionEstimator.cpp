@@ -22,20 +22,19 @@ Eigen::Vector3d PositionEstimator::calculateInitialGuess(
     const std::vector<WiFiScanner::APInfo> &meanAPInfos) {
   std::cout << "Calculating initial guess..." << std::endl;
   Eigen::Vector3d sumPosition(0.0, 0.0, 0.0);
-  int validAPCount = 0;
+  double totalWeight = 0.0;
 
   for (const auto &apInfo : meanAPInfos) {
-    std::cout << "AP Info position: " << apInfo.position.transpose()
-              << std::endl;
     if (apInfo.position.x() >= 0 && apInfo.position.y() >= 0 &&
         apInfo.position.z() >= 0) {
-      sumPosition += apInfo.position;
-      ++validAPCount;
+      double weight = 1.0 / (apInfo.distance + 1e-6); // Weighted by distance
+      sumPosition += weight * apInfo.position;
+      totalWeight += weight;
     }
   }
 
-  if (validAPCount > 0) {
-    Eigen::Vector3d initialGuess = sumPosition / validAPCount;
+  if (totalWeight > 0) {
+    Eigen::Vector3d initialGuess = sumPosition / totalWeight;
     std::cout << "Initial guess calculated: " << initialGuess.transpose()
               << std::endl;
     return initialGuess;
@@ -123,7 +122,6 @@ Eigen::Vector3d PositionEstimator::estimatePosition(WiFiScanner &scanner) {
     double observedDistance = apInfo.distance;
     Eigen::MatrixXd covarianceMatrix = covarianceMatrices[apInfo.bssid];
 
-    // Ensure the covariance matrix is the correct size
     if (covarianceMatrix.rows() != 1 || covarianceMatrix.cols() != 1) {
       std::cerr << "Covariance matrix for " << apInfo.bssid
                 << " has incorrect dimensions." << std::endl;
@@ -147,11 +145,9 @@ Eigen::Vector3d PositionEstimator::estimatePosition(WiFiScanner &scanner) {
   }
 
   Eigen::Vector3d initialGuess = calculateInitialGuess(meanAPInfos);
-  initialGuess +=
-      Eigen::Vector3d(0.1, 0.1, 0.1); // Slight adjustment to initial guess
   std::cout << "Initial Guess: " << initialGuess.transpose() << std::endl;
 
-  // Kalman Filter Initialization
+  // Kalman Filter Initialization with 3D Position Only
   gtsam::Vector x0 =
       (gtsam::Vector(3) << initialGuess.x(), initialGuess.y(), initialGuess.z())
           .finished();
@@ -211,6 +207,15 @@ Eigen::Vector3d PositionEstimator::estimatePosition(WiFiScanner &scanner) {
     // Ensure positive values higher than 0
     estimatedPosVec = estimatedPosVec.cwiseMax(1e-6);
 
+    // Sanity check to ensure estimated position is reasonable
+    if (estimatedPosVec.hasNaN() || (estimatedPosVec.array() < 1e-6).any()) {
+      std::cerr << "Estimated position is invalid: "
+                << estimatedPosVec.transpose() << std::endl;
+      throw std::runtime_error("Invalid estimated position.");
+    }
+
+    std::cout << "Estimated Position: " << estimatedPosVec.transpose()
+              << std::endl;
     return estimatedPosVec;
   } catch (const std::exception &e) {
     std::cerr << "Optimization failed: " << e.what() << std::endl;
