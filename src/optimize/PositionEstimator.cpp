@@ -100,7 +100,8 @@ Eigen::Vector3d PositionEstimator::estimatePosition(WiFiScanner &scanner) {
 
     // Construct the 3x3 covariance matrix for this AP
     Eigen::Matrix3d covarianceMatrix = Eigen::Matrix3d::Identity();
-    covarianceMatrix.diagonal() << stdDev * stdDev, stdDev * stdDev, stdDev * stdDev;
+    covarianceMatrix.diagonal() << stdDev * stdDev, stdDev * stdDev,
+        stdDev * stdDev;
     covarianceMatrices[bssid] = covarianceMatrix;
 
     std::cout << "AP Info: BSSID=" << bssid
@@ -126,15 +127,17 @@ Eigen::Vector3d PositionEstimator::estimatePosition(WiFiScanner &scanner) {
     gtsam::Point3 apPos(apPosition.x(), apPosition.y(), apPosition.z());
     gtsam::Expression<gtsam::Point3> apPositionExpr(apPos);
 
-    gtsam::Expression<gtsam::Point3> positionExpression{gtsam::Expression<gtsam::Point3>(vehiclePositionKey)};
+    gtsam::Expression<gtsam::Point3> positionExpression{
+        gtsam::Expression<gtsam::Point3>(vehiclePositionKey)};
 
     // Create the difference functor and factor
     Distance3DFunctor distance3DFunctor;
     auto differenceExpression = gtsam::Expression<gtsam::Vector3>(
-        std::function<gtsam::Vector3(const gtsam::Point3&, const gtsam::Point3&, gtsam::OptionalJacobian<3, 3>, gtsam::OptionalJacobian<3, 3>)>(distance3DFunctor), 
-        positionExpression, 
-        apPositionExpr
-    );
+        std::function<gtsam::Vector3(
+            const gtsam::Point3 &, const gtsam::Point3 &,
+            gtsam::OptionalJacobian<3, 3>, gtsam::OptionalJacobian<3, 3>)>(
+            distance3DFunctor),
+        positionExpression, apPositionExpr);
 
     auto positionFactor = gtsam::ExpressionFactor<gtsam::Vector3>(
         noiseModel, Eigen::Vector3d::Zero(), differenceExpression);
@@ -159,19 +162,22 @@ Eigen::Vector3d PositionEstimator::estimatePosition(WiFiScanner &scanner) {
       gtsam::Point3(initialGuess(0), initialGuess(1), initialGuess(2)));
 
   // Initialize Kalman Filter
-  const size_t state_dim = 3; // State dimension
+  const size_t state_dim = 3;
   gtsam::KalmanFilter kf(state_dim);
   gtsam::Vector initialMean = initialGuess;
-  gtsam::Matrix initialCovariance = Eigen::MatrixXd::Identity(state_dim, state_dim);
+  gtsam::Matrix initialCovariance =
+      Eigen::MatrixXd::Identity(state_dim, state_dim);
   gtsam::KalmanFilter::State kfState = kf.init(initialMean, initialCovariance);
 
   try {
     std::cout << "Starting optimization..." << std::endl;
-    gtsam::LevenbergMarquardtOptimizer optimizer(graph, initialEstimate, params);
+    gtsam::LevenbergMarquardtOptimizer optimizer(graph, initialEstimate,
+                                                 params);
     gtsam::Values result = optimizer.optimize();
     std::cout << "Optimization finished." << std::endl;
 
-    gtsam::Point3 estimatedPosition = result.at<gtsam::Point3>(vehiclePositionKey);
+    gtsam::Point3 estimatedPosition =
+        result.at<gtsam::Point3>(vehiclePositionKey);
     Eigen::Vector3d estimatedPosVec(
         estimatedPosition.x(), estimatedPosition.y(), estimatedPosition.z());
 
@@ -185,21 +191,24 @@ Eigen::Vector3d PositionEstimator::estimatePosition(WiFiScanner &scanner) {
       throw std::runtime_error("Invalid estimated position.");
     }
 
-    // Print the estimated position before Kalman Filter
-    std::cout << "Estimated Position (before Kalman Filter): " << estimatedPosVec.transpose() << std::endl;
+    std::cout << "Estimated Position (before Kalman Filter): "
+              << estimatedPosVec.transpose() << std::endl;
 
     // Kalman Filter Update
     gtsam::Vector measurement = estimatedPosVec;
-    gtsam::Matrix measurementCovariance = Eigen::MatrixXd::Identity(state_dim, state_dim);
-    gtsam::Matrix H = Eigen::MatrixXd::Identity(state_dim, state_dim); // Measurement matrix
+    gtsam::Matrix measurementCovariance =
+        Eigen::MatrixXd::Identity(state_dim, state_dim);
+    gtsam::Matrix H =
+        Eigen::MatrixXd::Identity(state_dim, state_dim); // Measurement matrix
 
-    gtsam::SharedDiagonal noise = gtsam::noiseModel::Diagonal::Sigmas(measurementCovariance.diagonal());
+    gtsam::SharedDiagonal noise =
+        gtsam::noiseModel::Diagonal::Sigmas(measurementCovariance.diagonal());
     kfState = kf.update(kfState, H, measurement, noise);
 
     // Extract the mean from the Kalman Filter state
     gtsam::Vector filteredMean = kfState->mean();
-    std::cout << "Estimated Position (after Kalman Filter): " << filteredMean.transpose()
-              << std::endl;
+    std::cout << "Estimated Position (after Kalman Filter): "
+              << filteredMean.transpose() << std::endl;
     return filteredMean;
   } catch (const std::exception &e) {
     std::cerr << "Optimization failed: " << e.what() << std::endl;
