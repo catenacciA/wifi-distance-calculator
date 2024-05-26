@@ -27,12 +27,9 @@ double LogDistanceCalculator::movingAverage(
 }
 
 double LogDistanceCalculator::calculateDistance(int signalStrength) const {
-  double pathLoss =
-      transmitPower -
-      signalStrength;
+  double pathLoss = transmitPower - signalStrength;
   double x_sigma = dist(gen);
-  double adjustedPathLoss =
-      pathLoss - x_sigma;
+  double adjustedPathLoss = pathLoss - x_sigma;
   return referenceDistance *
          std::pow(10.0, (adjustedPathLoss - referencePathLoss) /
                             (10.0 * pathLossExponent));
@@ -41,12 +38,16 @@ double LogDistanceCalculator::calculateDistance(int signalStrength) const {
 double LogDistanceCalculator::calculateDistance(
     const std::vector<int> &signalStrengths) const {
   double smoothedSignal = movingAverage(signalStrengths);
-  double pathLoss =
-      transmitPower - smoothedSignal;
+  double pathLoss = transmitPower - smoothedSignal;
   double x_sigma = dist(gen);
-  double adjustedPathLoss =
-      pathLoss - x_sigma;
+  double adjustedPathLoss = pathLoss - x_sigma;
   return referenceDistance *
          std::pow(10.0, (adjustedPathLoss - referencePathLoss) /
                             (10.0 * pathLossExponent));
+}
+
+std::tuple<double, double, double, double, double>
+LogDistanceCalculator::getModelParameters() const {
+  return std::make_tuple(pathLossExponent, referenceDistance, referencePathLoss,
+                         transmitPower, sigma);
 }

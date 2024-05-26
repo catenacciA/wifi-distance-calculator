@@ -12,14 +12,12 @@ public:
                         double referencePathLoss, double transmitPower,
                         double sigma);
   double calculateDistance(int signalStrength) const override;
-  double calculateDistance(const std::vector<int> &signalStrengths) const;
+  double
+  calculateDistance(const std::vector<int> &signalStrengths) const override;
 
   // Getter for model parameters
   std::tuple<double, double, double, double, double>
-  getModelParameters() const {
-    return std::make_tuple(pathLossExponent, referenceDistance,
-                           referencePathLoss, transmitPower, sigma);
-  }
+  getModelParameters() const override;
 
 private:
   double pathLossExponent;
