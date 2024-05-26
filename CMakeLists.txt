@@ -55,7 +55,7 @@ set(OPTIMIZE_MAIN_SOURCES
     src/wifi/WiFiScanner.cpp
     src/distance/LogDistanceCalculator.cpp
     src/optimize/PositionEstimator.cpp
-    src/optimize/DistanceFunctor.cpp
+    "include/optimize/Distance3DFunctor.h"
     src/utility/ProgressBar.cpp
     src/utility/ConfigParser.cpp
     src/utility/MathUtils.cpp   
