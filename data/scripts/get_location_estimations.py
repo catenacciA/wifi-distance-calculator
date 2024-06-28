@@ -1,6 +1,5 @@
 import subprocess
 import re
-import sys
 import argparse
 
 def run_wifi_scanner(interface, config_file, fingerprint_data, num_runs, location_id, output_file):

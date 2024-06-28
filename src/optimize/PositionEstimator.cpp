@@ -18,6 +18,9 @@ using namespace gtsam::symbol_shorthand;
 
 PositionEstimator::PositionEstimator() {}
 
+// Calculate the initial guess for the position based on the mean AP positions
+// Mathematically, the initial guess is the weighted average of the AP positions
+// weighted by the inverse of the distance
 Eigen::Vector3d PositionEstimator::calculateInitialGuess(
     const std::vector<WiFiScanner::APInfo> &meanAPInfos) {
   std::cout << "Calculating initial guess..." << std::endl;

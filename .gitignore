@@ -1,5 +1,7 @@
 build/
 
+.venv/
+
 data/output/errors_logDistance/
 data/output/location_errors/visualizations/
 data/output/rssi_analysis/

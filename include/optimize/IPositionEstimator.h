@@ -7,7 +7,9 @@
 class IPositionEstimator {
 public:
   virtual ~IPositionEstimator() = default;
-  virtual Eigen::Vector3d estimatePosition(WiFiScanner &scanner) = 0;
+  virtual Eigen::Vector3d estimatePosition(WiFiScanner &scanner) {
+    return Eigen::Vector3d(0.0, 0.0, 0.0);
+  }
 };
 
 #endif // IPOSITION_ESTIMATOR_H
